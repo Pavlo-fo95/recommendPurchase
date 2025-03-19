@@ -1,0 +1,74 @@
+{
+    "laptop": [
+        "smartphone",
+        "headphones"
+    ],
+    "headphones": [
+        "laptop",
+        "smartphone"
+    ],
+    "smartphone": [
+        "laptop",
+        "headphones"
+    ],
+    "sneakers": [
+        "jacket",
+        "t-shirt"
+    ],
+    "t-shirt": [
+        "jacket",
+        "sneakers"
+    ],
+    "jacket": [
+        "t-shirt",
+        "sneakers"
+    ],
+    "detective book": [
+        "fantasy book",
+        "science book"
+    ],
+    "science book": [
+        "fantasy book",
+        "detective book"
+    ],
+    "fantasy book": [
+        "detective book",
+        "science book"
+    ],
+    "dumbbells": [
+        "treadmill",
+        "bicycle"
+    ],
+    "treadmill": [
+        "bicycle",
+        "dumbbells"
+    ],
+    "bicycle": [
+        "treadmill",
+        "dumbbells"
+    ],
+    "car oil": [
+        "car accessories",
+        "car tires"
+    ],
+    "car tires": [
+        "car oil",
+        "car accessories"
+    ],
+    "car accessories": [
+        "car oil",
+        "car tires"
+    ],
+    "smartwatch": [
+        "tablet"
+    ],
+    "tablet": [
+        "smartwatch"
+    ],
+    "gaming mouse": [
+        "gaming keyboard"
+    ],
+    "gaming keyboard": [
+        "gaming mouse"
+    ]
+}

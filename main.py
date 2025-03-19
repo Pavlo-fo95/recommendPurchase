@@ -1,5 +1,25 @@
 import json
+import logging
+import sys
 from collections import defaultdict, Counter
+
+YELLOW = "\033[33m"
+RESET = "\033[0m"
+
+class CustomFormatter(logging.Formatter):
+    def format(self, record):
+        log_msg = super().format(record)
+        if record.levelno == logging.INFO:
+            return f"{YELLOW}{log_msg}{RESET}"
+        return log_msg
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(CustomFormatter("%(levelname)s: %(message)s"))
+
+logging.basicConfig(level=logging.INFO, handlers=[handler])
+
+json_file_path = "shopping_data.json"
+relations_file_path = "relations.json"
 
 shopping_data = {
     "users": [
@@ -11,82 +31,84 @@ shopping_data = {
     ]
 }
 
-json_file_path = "shopping_data.json"
+try:
+    with open(json_file_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+except FileNotFoundError:
+    with open(json_file_path, "w", encoding="utf-8") as file:
+        json.dump(shopping_data, file, indent=4, ensure_ascii=False)
+    data = shopping_data
 
-with open(json_file_path, "w", encoding="utf-8") as file:
-    json.dump(shopping_data, file, indent=4, ensure_ascii=False)
-
-
-# Функция загрузки данных из JSON
 def load_shopping_data():
     with open(json_file_path, "r", encoding="utf-8") as file:
         return json.load(file)
 
-
-# Функция построения связей между товарами
 def build_product_relations(data):
     relations = defaultdict(list)
     for user in data["users"]:
         for item in user["purchases"]:
             relations[item].extend(user["purchases"])
 
-    # Удаляем дубликаты и сам товар из списка рекомендаций
     for item in relations:
         relations[item] = list(set(relations[item]) - {item})
 
+    with open(relations_file_path, "w", encoding="utf-8") as file:
+        json.dump(relations, file, indent=4, ensure_ascii=False)
+
     return relations
 
+try:
+    with open(relations_file_path, "r", encoding="utf-8") as file:
+        product_relations = json.load(file)
+except FileNotFoundError:
+    product_relations = build_product_relations(data)
 
-# Функция рекомендации товаров
 def recommend_purchases(purchase_history, product_relations):
+    logging.info(f"Generating recommendations for: {purchase_history}")
     recommended = Counter()
+
     for item in purchase_history:
         if item in product_relations:
             recommended.update(product_relations[item])
 
-    # Убираем уже купленные товары
     for item in purchase_history:
         recommended.pop(item, None)
 
-    return [item for item, _ in recommended.most_common(3)]  # Топ-3 рекомендации
+    return [item for item, _ in recommended.most_common(3)]
 
-
-# Функция обновления покупок (обучение)
 def update_shopping_data(user_id, new_purchases):
     data = load_shopping_data()
 
     for user in data["users"]:
         if user["id"] == user_id:
             user["purchases"].extend(new_purchases)
-            user["purchases"] = list(set(user["purchases"]))  # Убираем дубликаты
+            user["purchases"] = list(set(user["purchases"]))
             break
     else:
         data["users"].append({"id": user_id, "purchases": new_purchases})
 
-    # Обновляем JSON-файл
     with open(json_file_path, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4, ensure_ascii=False)
 
-    print(f"✅ Updated shopping data for user {user_id}!")
+    logging.info(f"✅ Updated shopping data for user {user_id}!")
 
-    # Обновляем связи после добавления новых покупок
     return build_product_relations(data)
 
-
-# 🔹 2. Загружаем данные и строим связи
-data = load_shopping_data()
-product_relations = build_product_relations(data)
-
-# 🔹 3. Проверяем рекомендации перед обучением
 user_history = ["laptop", "smartphone"]
 suggested_purchases = recommend_purchases(user_history, product_relations)
 print(f"🛒 Based on {user_history}, recommended purchases: {suggested_purchases}")
 
-# 🔹 4. Обучение системы (добавляем новые покупки)
 product_relations = update_shopping_data(6, ["tablet", "smartwatch"])
 product_relations = update_shopping_data(7, ["gaming mouse", "gaming keyboard"])
 
-# 🔹 5. Теперь проверяем рекомендации для нового товара
 new_user_history = ["gaming mouse"]
 suggested_purchases_new = recommend_purchases(new_user_history, product_relations)
 print(f"🛒 Based on {new_user_history}, recommended purchases: {suggested_purchases_new}")
+
+while True:
+    user_input = input("\n🔹 Enter your purchases (comma-separated) or 'exit' to quit: \n")
+    if user_input.lower() == "exit":
+        break
+    user_history = [item.strip() for item in user_input.split(",")]
+    recommendations = recommend_purchases(user_history, product_relations)
+    print(f"🛒 Recommended based on {user_history}: {recommendations}")
