@@ -1,0 +1,58 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "purchases": [
+                "laptop",
+                "headphones",
+                "smartphone"
+            ]
+        },
+        {
+            "id": 2,
+            "purchases": [
+                "sneakers",
+                "t-shirt",
+                "jacket"
+            ]
+        },
+        {
+            "id": 3,
+            "purchases": [
+                "detective book",
+                "science book",
+                "fantasy book"
+            ]
+        },
+        {
+            "id": 4,
+            "purchases": [
+                "dumbbells",
+                "treadmill",
+                "bicycle"
+            ]
+        },
+        {
+            "id": 5,
+            "purchases": [
+                "car oil",
+                "car tires",
+                "car accessories"
+            ]
+        },
+        {
+            "id": 6,
+            "purchases": [
+                "tablet",
+                "smartwatch"
+            ]
+        },
+        {
+            "id": 7,
+            "purchases": [
+                "gaming mouse",
+                "gaming keyboard"
+            ]
+        }
+    ]
+}
